@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React from "react";
 
 export default function NavBar() {
@@ -7,9 +8,9 @@ export default function NavBar() {
                 <div className="lg:flex lg:items-center lg:justify-between">
                     <div className="flex items-center justify-between">
                         <div className="text-xl font-semibold text-gray-700">
-                            <a
+                            <Link
                                 className="text-2xl font-medium text-sky-500 transition-colors flex items-center duration-300 transform dark:text-sky-400 hover:text-sky-400 dark:hover:text-sky-300"
-                                href="#"
+                                href="/"
                             >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -27,7 +28,7 @@ export default function NavBar() {
                                 </svg>
 
                                 <h3 className="mx-2">Blog</h3>
-                            </a>
+                            </Link>
                         </div>
 
                         <div className="flex lg:hidden">
@@ -63,30 +64,30 @@ export default function NavBar() {
 
                     <div className="absolute inset-x-0 z-20 w-full px-6 py-4 transition-all duration-300 ease-in-out bg-white dark:bg-gray-800 lg:mt-0 lg:p-0 lg:top-0 lg:relative lg:bg-transparent lg:w-auto lg:opacity-100 lg:translate-x-0 lg:flex lg:items-center">
                         <div className="flex flex-col -mx-6 lg:flex-row lg:items-center">
-                            <a
+                            <Link
                                 href="#"
                                 className="px-4 py-1.5 mx-3 mt-2 text-gray-700 transition-colors duration-300 transform rounded-lg lg:mt-0 dark:text-gray-200 bg-gray-100 dark:bg-gray-700"
                             >
                                 Blog
-                            </a>
-                            <a
+                            </Link>
+                            <Link
                                 href="#"
                                 className="px-4 py-1.5 mx-3 mt-2 text-gray-700 transition-colors duration-300 transform rounded-lg lg:mt-0 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                             >
                                 Join Slack
-                            </a>
-                            <a
+                            </Link>
+                            <Link
                                 href="#"
                                 className="px-4 py-1.5 mx-3 mt-2 text-gray-700 transition-colors duration-300 transform rounded-lg lg:mt-0 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                             >
                                 Browse Topics
-                            </a>
-                            <a
+                            </Link>
+                            <Link
                                 href="#"
                                 className="px-4 py-1.5 mx-3 mt-2 text-gray-700 transition-colors duration-300 transform rounded-lg lg:mt-0 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                             >
                                 Random Item
-                            </a>
+                            </Link>
                         </div>
                     </div>
                 </div>
