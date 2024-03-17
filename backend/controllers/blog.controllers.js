@@ -120,9 +120,8 @@ const getBlogsByUserId = async (req, res) => {
  */
 const getBlogsByTags = async (req, res) => {
     try {
-        console.log(req.query.tag);
         const blogData = await blog.aggregate([
-            { $match: { tags: { $in: req.query.tags }, isDeleted: false } },
+            { $match: { tags: { $in: req.query.tag }, isDeleted: false } },
             { $sort: { createdAt: -1 } },
             { $limit: 10 },
             { $addFields: { numComments: { $size: "$comments" }, numLikes: { $size: "$likes" } } },
