@@ -2,6 +2,24 @@ import Link from "next/link";
 import React from "react";
 
 export default function NavBar() {
+    const links = [
+        {
+            id: 1,
+            link: "blogs",
+            placeHolder: "Blogs",
+        },
+        {
+            id: 2,
+            link: "browse-topics",
+            placeHolder: "Browse Topics",
+        },
+        {
+            id: 3,
+            link: "random-item",
+            placeHolder: "Random Item",
+        },
+    ];
+
     return (
         <nav className="relative bg-white dark:bg-gray-800">
             <div className="container px-4 py-6 mx-auto">
@@ -64,30 +82,15 @@ export default function NavBar() {
 
                     <div className="absolute inset-x-0 z-20 w-full px-6 py-4 transition-all duration-300 ease-in-out bg-white dark:bg-gray-800 lg:mt-0 lg:p-0 lg:top-0 lg:relative lg:bg-transparent lg:w-auto lg:opacity-100 lg:translate-x-0 lg:flex lg:items-center">
                         <div className="flex flex-col -mx-6 lg:flex-row lg:items-center">
-                            <Link
-                                href="#"
-                                className="px-4 py-1.5 mx-3 mt-2 text-gray-700 transition-colors duration-300 transform rounded-lg lg:mt-0 dark:text-gray-200 bg-gray-100 dark:bg-gray-700"
-                            >
-                                Blog
-                            </Link>
-                            <Link
-                                href="#"
-                                className="px-4 py-1.5 mx-3 mt-2 text-gray-700 transition-colors duration-300 transform rounded-lg lg:mt-0 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                            >
-                                Join Slack
-                            </Link>
-                            <Link
-                                href="#"
-                                className="px-4 py-1.5 mx-3 mt-2 text-gray-700 transition-colors duration-300 transform rounded-lg lg:mt-0 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                            >
-                                Browse Topics
-                            </Link>
-                            <Link
-                                href="#"
-                                className="px-4 py-1.5 mx-3 mt-2 text-gray-700 transition-colors duration-300 transform rounded-lg lg:mt-0 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                            >
-                                Random Item
-                            </Link>
+                            {links.map(link => (
+                                <Link
+                                    key={link.id}
+                                    href={link.link}
+                                    className="px-4 py-1.5 mx-3 mt-2 text-gray-700 transition-colors duration-300 transform rounded-lg lg:mt-0 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                >
+                                    {link.placeHolder}
+                                </Link>
+                            ))}
                         </div>
                     </div>
                 </div>

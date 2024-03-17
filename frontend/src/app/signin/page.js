@@ -4,7 +4,7 @@ import React from "react";
 
 export default function SignInPage() {
     return (
-        <section className="bg-white dark:bg-gray-900">
+        <section className="bg-white">
             <div className="container flex items-center justify-center min-h-screen px-6 mx-auto">
                 <form className="w-full max-w-md">
                     <div className="flex justify-center mx-auto">
@@ -12,10 +12,7 @@ export default function SignInPage() {
                     </div>
 
                     <div className="flex items-center justify-center mt-6">
-                        <p
-                            href="#"
-                            className="w-1/3 pb-4 font-medium text-center text-gray-800 capitalize border-b-2 border-blue-500 dark:border-blue-400 dark:text-white"
-                        >
+                        <p href="#" className="w-1/3 pb-4 font-medium text-center text-gray-800 capitalize border-b-2 border-blue-500">
                             sign In
                         </p>
                     </div>
@@ -24,11 +21,11 @@ export default function SignInPage() {
                         <span className="absolute">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                className="w-6 h-6 mx-3 text-gray-300 dark:text-gray-500"
+                                className="w-6 h-6 mx-3 text-gray-300"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
-                                stroke-width="2"
+                                strokeWidth="2"
                             >
                                 <path
                                     stroke-linecap="round"
@@ -40,7 +37,7 @@ export default function SignInPage() {
 
                         <input
                             type="email"
-                            className="block w-full py-3 text-gray-700 bg-white border rounded-lg px-11 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-300 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
+                            className="block w-full py-3 text-gray-700 bg-white border rounded-lg px-11 focus:border-blue-400 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
                             placeholder="Email address"
                         />
                     </div>
@@ -49,11 +46,11 @@ export default function SignInPage() {
                         <span className="absolute">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                className="w-6 h-6 mx-3 text-gray-300 dark:text-gray-500"
+                                className="w-6 h-6 mx-3 text-gray-300"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
-                                stroke-width="2"
+                                strokeWidth="2"
                             >
                                 <path
                                     stroke-linecap="round"
@@ -65,7 +62,7 @@ export default function SignInPage() {
 
                         <input
                             type="password"
-                            className="block w-full px-10 py-3 text-gray-700 bg-white border rounded-lg dark:bg-gray-900 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-300 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
+                            className="block w-full px-10 py-3 text-gray-700 bg-white border rounded-lg focus:border-blue-400focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
                             placeholder="Password"
                         />
                     </div>
@@ -75,10 +72,10 @@ export default function SignInPage() {
                             Sign In
                         </button>
 
-                        <div class="mt-6 text-center">
-                            <span class="text-sm text-gray-600 dark:text-gray-200">Don't have an account? </span>
+                        <div className="mt-6 text-center">
+                            <span className="text-sm text-gray-600">Don't have an account? </span>
 
-                            <Link href="/signup" class="mx-2 text-sm font-bold text-blue-500 dark:text-blue-400 hover:underline">
+                            <Link href="/signup" className="mx-2 text-sm font-bold text-blue-500 hover:underline">
                                 Register
                             </Link>
                         </div>
