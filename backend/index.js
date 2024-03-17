@@ -1,5 +1,6 @@
 // Import Modules
 import cookieParser from "cookie-parser";
+import logger from "winston-chalk";
 import mongoose from "mongoose";
 import express from "express";
 import morgan from "morgan";
@@ -12,6 +13,7 @@ import HttpError from "./utils/handleError.js";
 // Import Routes
 import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/user.routes.js";
+import blogRoutes from "./routes/blog.routes.js";
 
 // Validate environment variables
 validateEnv();
@@ -25,7 +27,7 @@ mongoose
     .connect(databaseURL)
     .then(() => {
         // DB connection is established
-        console.log("Database connected successfully");
+        logger.info("Database connected successfully");
 
         // Intialize express app
         const app = express();
@@ -50,6 +52,7 @@ mongoose
         // Add routes
         app.use("/auth", authRoutes);
         app.use("/api/users", userRoutes);
+        app.use("/api/blogs", blogRoutes);
 
         // Handle wrong routes
         app.all("*", (req, res, next) => {
@@ -69,7 +72,7 @@ mongoose
 
         // Listen to port
         app.listen(port, () => {
-            console.log(`Backend running at http://localhost:${port}`);
+            logger.info(`Backend running at http://localhost:${port}`);
         });
     })
     .catch(err => {
