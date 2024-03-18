@@ -2,13 +2,13 @@ import { initializeApp } from "firebase/app";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyDF8QGfi6tVp_nLHzdBSMOTmsh2wlBCPlw",
-    authDomain: "traveler-storage.firebaseapp.com",
-    projectId: "traveler-storage",
-    storageBucket: "traveler-storage.appspot.com",
-    messagingSenderId: "165949881544",
-    appId: "1:165949881544:web:bc02d24f090ff3478639fd",
-    measurementId: "G-YQJMYZGQPM",
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGIN_SENDER_ID,
+    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+    measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase
