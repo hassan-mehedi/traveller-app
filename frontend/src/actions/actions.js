@@ -52,4 +52,4 @@ const updateBlog = async blog => {
     return data;
 };
 
-export { createUser, createBlog, updateBlog };
+export { signIn, createUser, createBlog, updateBlog };

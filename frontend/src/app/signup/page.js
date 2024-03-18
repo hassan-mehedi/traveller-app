@@ -1,14 +1,77 @@
+"use client";
+
+import React, { useState } from "react";
 import Image from "next/image";
-import React from "react";
 import Link from "next/link";
+import AlertComponent from "@/components/alert";
+import storage from "@/firebase/config";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
+// Import actions
+import { createUser, uploadImageAndGetURL } from "@/actions/actions";
 
 export default function SignUpPage() {
+    const [formData, setFormData] = useState({ name: "", email: "", password: "", confirmPassword: "", image: "" });
+    const [isImageUploaded, setIsImageUploaded] = useState(false);
+    const [showAlert, setShowAlert] = useState(false);
+    const [message, setMessage] = useState("");
+    const [showProfileImage, setShowProfileImage] = useState("https://merakiui.com/images/logo.svg");
+    const [file, setFile] = useState(null);
+
+    const handleInput = e => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleImageInput = e => {
+        setFile(e.target.files[0]);
+        setShowProfileImage(URL.createObjectURL(e.target.files[0]));
+        setIsImageUploaded(true);
+    };
+
+    const handleSubmit = e => {
+        e.preventDefault();
+
+        // validate data
+        if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+            setMessage("Please fill all the fields");
+            setShowAlert(true);
+            return;
+        }
+
+        if (formData.password !== formData.confirmPassword) {
+            setMessage("Passwords do not match");
+            setShowAlert(true);
+            return;
+        }
+
+        // upload image if it's inserted
+        if (isImageUploaded) {
+            const dateTime = new Date().toISOString();
+            const imageName = `${formData.name}-${dateTime}`;
+            const storageRef = ref(storage, `images/${imageName}`);
+
+            uploadBytes(storageRef, file).then(snapshot => {
+                getDownloadURL(snapshot.ref).then(downloadURL => {
+                    formData.image = downloadURL;
+                    // send data to backend
+                    createUser(formData).then(data => {
+                        console.log(data);
+                    });
+                });
+            });
+        } else {
+            createUser(formData).then(data => {
+                console.log(data);
+            });
+        }
+    };
+
     return (
         <section className="bg-white">
             <div className="container flex items-center justify-center mt-16 px-6 mx-auto">
-                <form className="w-full max-w-md">
+                <form onSubmit={handleSubmit} className="w-full max-w-md">
                     <div className="flex justify-center mx-auto">
-                        <Image className="w-auto h-7 sm:h-8" width={40} height={40} src="https://merakiui.com/images/logo.svg" alt="" />
+                        <Image className="w-auto h-7 sm:h-8" width={40} height={40} src={showProfileImage} alt="Profile Picture" />
                     </div>
 
                     <div className="flex items-center justify-center mt-6">
@@ -36,9 +99,11 @@ export default function SignUpPage() {
                         </span>
 
                         <input
+                            onInput={handleInput}
                             type="text"
+                            name="name"
                             className="block w-full py-3 text-gray-700 bg-white border rounded-lg px-11 focus:border-blue-400 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
-                            placeholder="Username"
+                            placeholder="Name"
                         />
                     </div>
 
@@ -59,10 +124,14 @@ export default function SignUpPage() {
 
                         <h2 className="mx-3 text-gray-400">Profile Photo</h2>
 
-                        <input id="dropzone-file" type="file" className="hidden" />
+                        <input onChange={handleImageInput} id="dropzone-file" type="file" accept="image/*" className="hidden" />
                     </label>
 
-                    <div className="relative flex items-center mt-6">
+                    <span className={`flex justify-end mt-1 text-sm ${isImageUploaded ? "text-green-500" : "text-red-500"}`}>
+                        {isImageUploaded ? "Image inserted" : "No image inserted"}
+                    </span>
+
+                    <div className="relative flex items-center mt-3">
                         <span className="absolute">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -81,9 +150,11 @@ export default function SignUpPage() {
                         </span>
 
                         <input
+                            onInput={handleInput}
+                            name="email"
                             type="email"
                             className="block w-full py-3 text-gray-700 bg-white border rounded-lg px-11 focus:border-blue-400 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
-                            placeholder="Email address"
+                            placeholder="Email"
                         />
                     </div>
 
@@ -106,6 +177,8 @@ export default function SignUpPage() {
                         </span>
 
                         <input
+                            onInput={handleInput}
+                            name="password"
                             type="password"
                             className="block w-full px-10 py-3 text-gray-700 bg-white border rounded-lg focus:border-blue-400 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
                             placeholder="Password"
@@ -131,6 +204,8 @@ export default function SignUpPage() {
                         </span>
 
                         <input
+                            onInput={handleInput}
+                            name="confirmPassword"
                             type="password"
                             className="block w-full px-10 py-3 text-gray-700 bg-white border rounded-lg focus:border-blue-400 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
                             placeholder="Confirm Password"
@@ -138,7 +213,10 @@ export default function SignUpPage() {
                     </div>
 
                     <div className="mt-6">
-                        <button className="w-full px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-lg hover:bg-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50">
+                        <button
+                            type="submit"
+                            className="w-full px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-lg hover:bg-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50"
+                        >
                             Sign Up
                         </button>
 
@@ -152,6 +230,7 @@ export default function SignUpPage() {
                     </div>
                 </form>
             </div>
+            {showAlert && <AlertComponent message={message} setShowAlert={setShowAlert} />}
         </section>
     );
 }

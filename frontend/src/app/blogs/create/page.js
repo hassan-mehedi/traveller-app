@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import AlertComponent from "@/components/alert";
 
 export default function CreateBlog() {
-    const [data, setData] = useState({ title: "", description: "", images: [] });
+    const [data, setData] = useState({ title: "", description: "", image: [] });
     const [isImageUploaded, setIsImageUploaded] = useState(false);
     const [showAlert, setShowAlert] = useState(false);
     const [message, setMessage] = useState("");
@@ -16,12 +16,14 @@ export default function CreateBlog() {
 
     // handle image input
     const handleImageInput = e => {
-        setData({ ...data, images: [...data.images, e.target.files[0]] });
+        setData({ ...data, image: [e.target.files[0]] });
         setIsImageUploaded(true);
     };
 
     const handleSubmit = e => {
         e.preventDefault();
+
+        console.log(data);
 
         // validate data
         if (!data.title || !data.description) {
