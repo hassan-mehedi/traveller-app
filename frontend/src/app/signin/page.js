@@ -1,12 +1,42 @@
+"use client";
+
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import React from "react";
+import { SnackbarProvider, useSnackbar } from "notistack";
+import { signIn } from "@/actions/actions";
 
-export default function SignInPage() {
+function SignInPage() {
+    const router = useRouter();
+    const { enqueueSnackbar } = useSnackbar();
+    const [formData, setFormData] = React.useState({ email: "", password: "" });
+
+    const handleInput = e => {
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+    };
+
+    const handleSubmit = async e => {
+        e.preventDefault();
+
+        const response = await signIn(formData);
+
+        if (response.error) {
+            enqueueSnackbar(response.message, { variant: "error" });
+            return;
+        }
+
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("user_id", response.data.user._id);
+        enqueueSnackbar("Login Successful", { variant: "success" });
+        router.push("/blogs");
+    };
+
     return (
         <section className="bg-white">
             <div className="container flex items-center justify-center mt-16 px-6 mx-auto">
-                <form className="w-full max-w-md">
+                <form onSubmit={handleSubmit} className="w-full max-w-md">
                     <div className="flex justify-center mx-auto">
                         <Image className="w-auto h-7 sm:h-8" width={40} height={40} src="https://merakiui.com/images/logo.svg" alt="" />
                     </div>
@@ -37,6 +67,9 @@ export default function SignInPage() {
 
                         <input
                             type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleInput}
                             className="block w-full py-3 text-gray-700 bg-white border rounded-lg px-11 focus:border-blue-400 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
                             placeholder="Email address"
                         />
@@ -62,13 +95,19 @@ export default function SignInPage() {
 
                         <input
                             type="password"
+                            name="password"
+                            value={formData.password}
+                            onInput={handleInput}
                             className="block w-full px-10 py-3 text-gray-700 bg-white border rounded-lg focus:border-blue-400focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
                             placeholder="Password"
                         />
                     </div>
 
                     <div className="mt-6">
-                        <button className="w-full px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-lg hover:bg-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50">
+                        <button
+                            type="submit"
+                            className="w-full px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-lg hover:bg-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50"
+                        >
                             Sign In
                         </button>
 
@@ -85,3 +124,11 @@ export default function SignInPage() {
         </section>
     );
 }
+
+export default () => {
+    return (
+        <SnackbarProvider maxSnack={3}>
+            <SignInPage />
+        </SnackbarProvider>
+    );
+};
