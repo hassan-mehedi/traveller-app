@@ -135,4 +135,18 @@ const deleteUserById = async (req, res, next) => {
     }
 };
 
-export { createUser, getUsers, getUserById, updateUserById, deleteUserById };
+const getUserByEmail = async (req, res, next) => {
+    try {
+        const userData = await user.findOne({ email: req.params.email, isDeleted: false }, "-password");
+
+        if (!userData) {
+            return next(new HttpError(404, "User not found"));
+        }
+
+        return res.status(200).json({ message: "User found successfully", data: userData });
+    } catch (err) {
+        next(err);
+    }
+};
+
+export { createUser, getUsers, getUserById, updateUserById, deleteUserById, getUserByEmail };

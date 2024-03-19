@@ -65,7 +65,7 @@ mongoose
             err.statusCode = err.statusCode || 500;
 
             res.status(err.statusCode).json({
-                status: err.status,
+                error: true,
                 message: err.message,
             });
         });
