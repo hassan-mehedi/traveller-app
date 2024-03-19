@@ -1,5 +1,11 @@
 "use server";
 
+const getUserByEmail = async email => {
+    const response = await fetch("http://localhost:5000/api/users/email/" + email);
+    const data = await response.json();
+    return data;
+};
+
 const createUser = async user => {
     const response = await fetch("http://localhost:5000/api/users", {
         method: "POST",
@@ -52,4 +58,4 @@ const updateBlog = async blog => {
     return data;
 };
 
-export { signIn, createUser, createBlog, updateBlog };
+export { signIn, createUser, createBlog, updateBlog, getUserByEmail };

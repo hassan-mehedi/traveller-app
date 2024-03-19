@@ -3,68 +3,136 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import AlertComponent from "@/components/alert";
 import storage from "@/firebase/config";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { createUser, getUserByEmail } from "@/actions/actions";
 
-// Import actions
-import { createUser, uploadImageAndGetURL } from "@/actions/actions";
+const initialState = {
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    image: "",
+    isImageUploaded: false,
+    showAlert: false,
+    message: "",
+    type: "",
+};
+const initialProfileImage = "https://merakiui.com/images/logo.svg";
 
 export default function SignUpPage() {
-    const [formData, setFormData] = useState({ name: "", email: "", password: "", confirmPassword: "", image: "" });
-    const [isImageUploaded, setIsImageUploaded] = useState(false);
-    const [showAlert, setShowAlert] = useState(false);
-    const [message, setMessage] = useState("");
+    const router = useRouter();
+    const [state, setState] = useState(initialState);
     const [showProfileImage, setShowProfileImage] = useState("https://merakiui.com/images/logo.svg");
     const [file, setFile] = useState(null);
 
     const handleInput = e => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        setState(prevState => ({ ...prevState, [name]: value }));
     };
 
     const handleImageInput = e => {
-        setFile(e.target.files[0]);
-        setShowProfileImage(URL.createObjectURL(e.target.files[0]));
-        setIsImageUploaded(true);
+        const selectedFile = e.target.files[0];
+        setFile(selectedFile);
+        setShowProfileImage(URL.createObjectURL(selectedFile));
+        setState(prevState => ({ ...prevState, isImageUploaded: true }));
     };
 
-    const handleSubmit = e => {
+    const validateFormData = ({ name, email, password, confirmPassword }) => {
+        if (!name || !email || !password || !confirmPassword) {
+            setState(prevState => ({
+                ...prevState,
+                message: "Please fill all the fields",
+                type: "warning",
+                showAlert: true,
+            }));
+            return false;
+        }
+
+        if (password !== confirmPassword) {
+            setState(prevState => ({
+                ...prevState,
+                message: "Passwords do not match",
+                type: "error",
+                showAlert: true,
+            }));
+            return false;
+        }
+        return true;
+    };
+
+    const handleSubmit = async e => {
         e.preventDefault();
+        const formData = { ...state };
+        delete formData.showAlert;
+        delete formData.message;
+        delete formData.type;
+        delete formData.isImageUploaded;
 
-        // validate data
-        if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
-            setMessage("Please fill all the fields");
-            setShowAlert(true);
+        console.log(formData);
+
+        if (!validateFormData(formData)) return;
+
+        const checkUser = await getUserByEmail(formData.email);
+        if (checkUser.data) {
+            setState(prevState => ({
+                ...prevState,
+                message: "User with the same email already exists",
+                type: "error",
+                showAlert: true,
+            }));
             return;
         }
 
-        if (formData.password !== formData.confirmPassword) {
-            setMessage("Passwords do not match");
-            setShowAlert(true);
-            return;
-        }
-
-        // upload image if it's inserted
-        if (isImageUploaded) {
-            const dateTime = new Date().toISOString();
-            const imageName = `${formData.name}-${dateTime}`;
-            const storageRef = ref(storage, `images/${imageName}`);
-
-            uploadBytes(storageRef, file).then(snapshot => {
-                getDownloadURL(snapshot.ref).then(downloadURL => {
-                    formData.image = downloadURL;
-                    // send data to backend
-                    createUser(formData).then(data => {
-                        console.log(data);
-                    });
-                });
-            });
+        if (state.isImageUploaded) {
+            try {
+                const dateTime = new Date().toISOString();
+                const imageName = `${formData.name}-${dateTime}`;
+                const storageRef = ref(storage, `images/${imageName}`);
+                const snapshot = await uploadBytes(storageRef, file);
+                const downloadURL = await getDownloadURL(snapshot.ref);
+                formData.image = downloadURL;
+                await createUserAndHandleResponse(formData);
+            } catch (error) {
+                console.error(error);
+                setState(prevState => ({
+                    ...prevState,
+                    message: error.message,
+                    type: "error",
+                    showAlert: true,
+                }));
+            }
         } else {
-            createUser(formData).then(data => {
-                console.log(data);
-            });
+            await createUserAndHandleResponse(formData);
         }
     };
+
+    const createUserAndHandleResponse = async formData => {
+        const response = await createUser(formData);
+        if (response.error) {
+            setState(prevState => ({
+                ...prevState,
+                message: response.error,
+                type: "error",
+                showAlert: true,
+            }));
+        } else {
+            setState(prevState => ({
+                ...prevState,
+                ...initialState,
+                message: response.message,
+                type: "success",
+                showAlert: true,
+            }));
+            setShowProfileImage(initialProfileImage);
+            setFile(null);
+            router.push("/signin");
+        }
+    };
+
+    const { showAlert, type, message } = state;
 
     return (
         <section className="bg-white">
@@ -102,6 +170,7 @@ export default function SignUpPage() {
                             onInput={handleInput}
                             type="text"
                             name="name"
+                            value={state.name}
                             className="block w-full py-3 text-gray-700 bg-white border rounded-lg px-11 focus:border-blue-400 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
                             placeholder="Name"
                         />
@@ -127,8 +196,8 @@ export default function SignUpPage() {
                         <input onChange={handleImageInput} id="dropzone-file" type="file" accept="image/*" className="hidden" />
                     </label>
 
-                    <span className={`flex justify-end mt-1 text-sm ${isImageUploaded ? "text-green-500" : "text-red-500"}`}>
-                        {isImageUploaded ? "Image inserted" : "No image inserted"}
+                    <span className={`flex justify-end mt-1 text-sm ${state.isImageUploaded ? "text-green-500" : "text-red-500"}`}>
+                        {state.isImageUploaded ? "Image inserted" : "No image inserted"}
                     </span>
 
                     <div className="relative flex items-center mt-3">
@@ -153,6 +222,7 @@ export default function SignUpPage() {
                             onInput={handleInput}
                             name="email"
                             type="email"
+                            value={state.email}
                             className="block w-full py-3 text-gray-700 bg-white border rounded-lg px-11 focus:border-blue-400 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
                             placeholder="Email"
                         />
@@ -180,6 +250,7 @@ export default function SignUpPage() {
                             onInput={handleInput}
                             name="password"
                             type="password"
+                            value={state.password}
                             className="block w-full px-10 py-3 text-gray-700 bg-white border rounded-lg focus:border-blue-400 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
                             placeholder="Password"
                         />
@@ -207,6 +278,7 @@ export default function SignUpPage() {
                             onInput={handleInput}
                             name="confirmPassword"
                             type="password"
+                            value={state.confirmPassword}
                             className="block w-full px-10 py-3 text-gray-700 bg-white border rounded-lg focus:border-blue-400 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
                             placeholder="Confirm Password"
                         />
@@ -230,7 +302,9 @@ export default function SignUpPage() {
                     </div>
                 </form>
             </div>
-            {showAlert && <AlertComponent message={message} setShowAlert={setShowAlert} />}
+            {showAlert && (
+                <AlertComponent type={type} message={message} setShowAlert={show => setState(prevState => ({ ...prevState, showAlert: show }))} />
+            )}
         </section>
     );
 }

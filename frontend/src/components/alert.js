@@ -34,7 +34,7 @@ export default function AlertComponent({ type, message, setShowAlert }) {
     useEffect(() => {
         setTimeout(() => {
             setShowAlert(false);
-        }, 3000);
+        }, 5000);
     });
 
     return (
