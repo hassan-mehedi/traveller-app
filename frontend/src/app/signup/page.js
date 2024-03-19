@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import AlertComponent from "@/components/alert";
 import storage from "@/firebase/config";
+import { SnackbarProvider, useSnackbar } from "notistack";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { createUser, getUserByEmail } from "@/actions/actions";
 
@@ -16,16 +16,14 @@ const initialState = {
     confirmPassword: "",
     image: "",
     isImageUploaded: false,
-    showAlert: false,
-    message: "",
-    type: "",
 };
 const initialProfileImage = "https://merakiui.com/images/logo.svg";
 
-export default function SignUpPage() {
+function SignUpPage() {
     const router = useRouter();
+    const { enqueueSnackbar } = useSnackbar();
     const [state, setState] = useState(initialState);
-    const [showProfileImage, setShowProfileImage] = useState("https://merakiui.com/images/logo.svg");
+    const [showProfileImage, setShowProfileImage] = useState(initialProfileImage);
     const [file, setFile] = useState(null);
 
     const handleInput = e => {
@@ -42,22 +40,12 @@ export default function SignUpPage() {
 
     const validateFormData = ({ name, email, password, confirmPassword }) => {
         if (!name || !email || !password || !confirmPassword) {
-            setState(prevState => ({
-                ...prevState,
-                message: "Please fill all the fields",
-                type: "warning",
-                showAlert: true,
-            }));
+            enqueueSnackbar("Please fill all the fields", { variant: "warning" });
             return false;
         }
 
         if (password !== confirmPassword) {
-            setState(prevState => ({
-                ...prevState,
-                message: "Passwords do not match",
-                type: "error",
-                showAlert: true,
-            }));
+            enqueueSnackbar("Passwords do not match", { variant: "error" });
             return false;
         }
         return true;
@@ -66,23 +54,13 @@ export default function SignUpPage() {
     const handleSubmit = async e => {
         e.preventDefault();
         const formData = { ...state };
-        delete formData.showAlert;
-        delete formData.message;
-        delete formData.type;
         delete formData.isImageUploaded;
-
-        console.log(formData);
 
         if (!validateFormData(formData)) return;
 
         const checkUser = await getUserByEmail(formData.email);
         if (checkUser.data) {
-            setState(prevState => ({
-                ...prevState,
-                message: "User with the same email already exists",
-                type: "error",
-                showAlert: true,
-            }));
+            enqueueSnackbar("User with the same email already exists", { variant: "error" });
             return;
         }
 
@@ -97,12 +75,7 @@ export default function SignUpPage() {
                 await createUserAndHandleResponse(formData);
             } catch (error) {
                 console.error(error);
-                setState(prevState => ({
-                    ...prevState,
-                    message: error.message,
-                    type: "error",
-                    showAlert: true,
-                }));
+                enqueueSnackbar(error.message, { variant: "error" });
             }
         } else {
             await createUserAndHandleResponse(formData);
@@ -112,27 +85,14 @@ export default function SignUpPage() {
     const createUserAndHandleResponse = async formData => {
         const response = await createUser(formData);
         if (response.error) {
-            setState(prevState => ({
-                ...prevState,
-                message: response.error,
-                type: "error",
-                showAlert: true,
-            }));
+            enqueueSnackbar(response.error, { variant: "error" });
         } else {
-            setState(prevState => ({
-                ...prevState,
-                ...initialState,
-                message: response.message,
-                type: "success",
-                showAlert: true,
-            }));
+            enqueueSnackbar(response.message, { variant: "success" });
             setShowProfileImage(initialProfileImage);
             setFile(null);
             router.push("/signin");
         }
     };
-
-    const { showAlert, type, message } = state;
 
     return (
         <section className="bg-white">
@@ -302,9 +262,14 @@ export default function SignUpPage() {
                     </div>
                 </form>
             </div>
-            {showAlert && (
-                <AlertComponent type={type} message={message} setShowAlert={show => setState(prevState => ({ ...prevState, showAlert: show }))} />
-            )}
         </section>
     );
 }
+
+export default () => {
+    return (
+        <SnackbarProvider maxSnack={3}>
+            <SignUpPage />
+        </SnackbarProvider>
+    );
+};
