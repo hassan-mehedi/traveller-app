@@ -63,7 +63,7 @@ const getUserById = async (req, res, next) => {
         const userData = await user.findOne({ _id: req.params.id, isDeleted: false }, "-password");
 
         if (!userData) {
-            return next(new HttpError(404, "User not found"));
+            return res.status(404).json({ error: true, message: "User not found" });
         }
 
         return res.status(200).json({ message: "User found successfully", data: userData });
@@ -86,7 +86,7 @@ const updateUserById = async (req, res, next) => {
         const userExists = await user.findOne({ _id: req.params.id, isDeleted: false });
 
         if (!userExists) {
-            return next(new HttpError(404, "User not found"));
+            return res.status(404).json({ error: true, message: "User not found" });
         }
 
         // Don't update password even if it was sent in the request body
@@ -119,7 +119,7 @@ const deleteUserById = async (req, res, next) => {
         const userExists = await user.findOne({ _id: req.params.id, isDeleted: false });
 
         if (!userExists) {
-            return next(new HttpError(404, "User not found"));
+            return res.status(404).json({ error: true, message: "User not found" });
         }
 
         // Update user's isDeleted field to true
@@ -140,7 +140,7 @@ const getUserByEmail = async (req, res, next) => {
         const userData = await user.findOne({ email: req.params.email, isDeleted: false }, "-password");
 
         if (!userData) {
-            return next(new HttpError(404, "User not found"));
+            return res.status(404).json({ error: true, message: "User not found" });
         }
 
         return res.status(200).json({ message: "User found successfully", data: userData });

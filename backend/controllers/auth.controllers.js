@@ -9,7 +9,6 @@ import removeKeysFromObject from "../utils/removeObjectKey.js";
 
 // Import Models
 import user from "../models/user.model.js";
-import blog from "../models/blog.model.js";
 
 const signIn = async (req, res, next) => {
     try {
@@ -17,11 +16,11 @@ const signIn = async (req, res, next) => {
         const userData = await user.findOne({ email: req.body.email, isDeleted: false });
 
         // Check if the data is empty
-        if (!userData) return res.status(404).json({ message: "User not found" });
+        if (!userData) return res.status(404).json({ error: true, message: "User not found" });
 
         // Match the password
         const checkPassword = bcrypt.compareSync(req.body.password, userData.password);
-        if (!checkPassword) return res.status(401).json({ message: "Invalid password" });
+        if (!checkPassword) return res.status(401).json({ error: true, message: "Invalid password" });
 
         // Remove password from user data
         const userDataWithoutPassword = removeKeysFromObject(userData.toObject(), ["password"]);
